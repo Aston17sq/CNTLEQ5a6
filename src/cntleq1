@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# 安装sendmail，开机自启，启动服务，检查运行状态。
+#sudo yum install sendmail -y
+#sudo systemctl enable sendmail
+#sudo systemctl start sendmail
+#sudo systemctl status sendmail --no-pager
+#echo -e "若显示服务Active，说明sendmail服务安装成功了，可以继续执行(无需做任何处理)，否则请按下Ctrl+C停止执行此脚本(5秒等待期)"
+
+#安装xinetd
+sudo yum install xinetd -y
+sudo systemctl enable xinetd
+sudo systemctl start xinetd
+sudo systemctl status xinetd --no-pager
+echo -e "\e[1;31;42m 若显示服务Active，说明xinetd服务安装成功了，可以继续执行(无需做任何处理)，否则请按下Ctrl+C停止执行此脚本(5秒等待期) \e[0m"
+sudo sleep 5
+
+#安装telnet-server
+sudo yum list | grep telnet
+sudo yum install telnet-server -y
+sudo systemctl enable telnet
+sudo systemctl enable telnet.socket
+sudo systemctl start telnet.socket
+sudo systemctl status telnet.socket --no-pager
+echo -e "\e[1;31;42m 若显示服务Active，说明telnet-server服务安装成功了，可以继续执行(无需做任何处理)，否则请按下Ctrl+C停止执行此脚本(5秒等待期) \e[0m"
+sudo sleep 5
+
+#查看防火墙状态，开启则关闭
+sudo firewall-cmd  --state
+sudo systemctl stop firewalld
+if [ $? -ne 0 ];then
+	echo -e "\e[1;31;42m 防火墙未能成功关闭 或者 在执行关闭命令前就已经关闭了\n下面将查看状态(3秒后) \e[0m"
+	sudo sleep 3
+	sudo firewall-cmd --state
+	echo -e "\e[1;31;42m 若显示关闭，则无需处理，否则请停止脚本并自行检查\n注意：此时telnet服务并未关闭(5秒等待期) \e[0m"
+	sleep 5
+else 
+	echo -e "\e[1;31;42m 防火墙关闭成功了，5秒后执行关闭telnet命令 \e[0m"
+	sudo sleep 5
+fi
+
+echo -e "\e[1;31;42m 执行关闭telnet.socket命令(1秒后) \e[0m"
+sudo sleep 1
+sudo systemctl stop telnet.socket
+if [ $? -ne 0 ]; then
+	echo -e "\e[1;31;42m telnet服务未成功关闭 或者 在执行关闭命令前就已经关闭了\n下面将查看状态(3秒后) \e[0m"
+	sudo sleep 3
+	sudo systemctl status telnet.socket --no-pager
+	echo -e "\e[1;31;42m 若服务的确关闭，可以继续执行(无需做任何处理)，否则请按下Ctrl+C停止执行此脚本(5秒等待期) \e[0m"
+else 
+	echo -e "\e[1;31;42m telnet服务成功关闭\n现在可以进行第5题(1)的抓包了 \e[0m"
+fi
+

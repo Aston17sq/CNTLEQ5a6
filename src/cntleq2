@@ -1,0 +1,15 @@
+#!/bin/bash
+
+echo -e "\e[1;31;42m 请确保你现在要做5(2)题，如果不是，请按Ctrl+C退出脚本(5秒等待期) \e[0m"
+sudo sleep 5
+
+sudo systemctl start telnet.socket
+if [ $? -ne 0 ]; then
+	echo -e "\e[1;31;42m telnet服务启动失败了，请退出脚本 \e[0m"
+        exit
+else
+	echo -e "\e[1;31;42m telnet服务正确启动了，下面将查看状态(3秒后) \e[0m"
+        sudo sleep 3
+        sudo systemctl status telnet.socket --no-pager
+        echo -e "\e[1;31;42m 现在可以做5(2)题了 \e[0m"
+fi

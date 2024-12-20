@@ -1,0 +1,19 @@
+#!/bin/bash
+
+sudo yum install openssh-server -y
+sudo systemctl start sshd
+sudo systemctl enable sshd
+sudo systemctl status sshd --no-pager
+if [ $? -ne 0 ]; then
+	echo -e "\e[1;31;42m sshd服务处于非正常运行状态，不符合6(1)前置要求 \e[0m"
+	exit
+else
+	sudo systemctl start firewalld
+	sudo systemctl status firewalld --no-pager
+	sudo firewall-cmd --permanent --remove-service=ssh
+	sudo firewall-cmd --remove-port=22/tcp --permanent
+	sudo firewall-cmd --reload
+	sudo firewall-cmd --list-all
+	echo -e "\e[1;31;42m 22端口已关闭 符合6(1)前置条件，现在可以进行6(1)了\n若要恢复22端口，请依次执行下列命令 或 执行run_me.bash, 选择 4 执行 sq4.bash\n\nsudo firewall-cmd --permanent --add-service=ssh\nsudo firewall-cmd --add-port=22/tcp --permanent\nsudo firewall-cmd --reload\nsudo firewall-cmd --list-all\n\n \e[0m"
+	sudo sleep 1
+fi

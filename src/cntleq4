@@ -1,0 +1,11 @@
+#!/bin/bash
+
+#解除防火墙封禁SSH服务，打开22端口，重载防火墙，查看详细结果
+sudo firewall-cmd --permanent --add-service=ssh
+sudo firewall-cmd --add-port=22/tcp --permanent
+sudo firewall-cmd --reload
+sudo firewall-cmd --list-all
+
+sudo systemctl start sshd
+sudo systemctl status sshd --no-pager
+
